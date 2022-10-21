@@ -15,51 +15,95 @@ public class GumballMachine {
 
     public void quarterInserted() {
         if (soldOut) {
-            device.displayMessage(SO_QUART);
-            device.dispenseQuarter();
+            quarterInsertedWhenSoldOut();
         } else if (hasQuarter) {
-            device.dispenseQuarter();
-            device.displayMessage(HQ_QUART);
+            quarterInsertedWhenHasQuarter();
         } else {
-            device.displayMessage(NQ_QUART);
-            hasQuarter = true;
+            quarterInsertedWhenNoQuarter();
         }
     }
 
     public void ejectQuarterRequested() {
         if (soldOut) {
-            device.displayMessage(SO_EJECT);
+            ejectQuarterWhenSoldOut();
         } else if (hasQuarter) {
-            device.displayMessage(HQ_EJECT);
-            device.dispenseQuarter();
-            hasQuarter = false;
+            ejectQuarterWhenHasQuarter();
         } else {
-            device.displayMessage(NQ_EJECT);
+            ejectQuarterWhenNoQuarter();
         }
     }
 
     public void crankTurned() {
         if (soldOut) {
-            device.displayMessage(SO_CRANK);
+            crankTurnedWhenSoldOut();
         } else if (hasQuarter) {
-            if (device.dispenseGumball()) {
-                device.displayMessage(NQ_START);
-            } else {
-                soldOut = true;
-                device.displayMessage(SO_START);
-                device.dispenseQuarter();
-            }
-            hasQuarter = false;
+            crankTurnedWhenHasQuarter();
         } else {
-            device.displayMessage(NQ_CRANK);
+            crankTurnedWhenNoQuarter();
         }
 
     }
 
     public void refill() {
         if (soldOut) {
-            soldOut = false;
-            device.displayMessage(NQ_START);
+            refillWhenSoldOut();
         }
+    }
+
+    //Insert Quarter
+    private void quarterInsertedWhenNoQuarter() {
+        device.displayMessage(NQ_QUART);
+        hasQuarter = true;
+    }
+
+    private void quarterInsertedWhenHasQuarter() {
+        device.dispenseQuarter();
+        device.displayMessage(HQ_QUART);
+    }
+
+    private void quarterInsertedWhenSoldOut() {
+        device.displayMessage(SO_QUART);
+        device.dispenseQuarter();
+    }
+
+    //Eject Quarter
+    private void ejectQuarterWhenNoQuarter() {
+        device.displayMessage(NQ_EJECT);
+    }
+
+    private void ejectQuarterWhenHasQuarter() {
+        device.displayMessage(HQ_EJECT);
+        device.dispenseQuarter();
+        hasQuarter = false;
+    }
+
+    private void ejectQuarterWhenSoldOut() {
+        device.displayMessage(SO_EJECT);
+    }
+
+    //Crank Turned
+    private void crankTurnedWhenNoQuarter() {
+        device.displayMessage(NQ_CRANK);
+    }
+
+    private void crankTurnedWhenHasQuarter() {
+        if (device.dispenseGumball()) {
+            device.displayMessage(NQ_START);
+        } else {
+            soldOut = true;
+            device.displayMessage(SO_START);
+            device.dispenseQuarter();
+        }
+        hasQuarter = false;
+    }
+
+    private void crankTurnedWhenSoldOut() {
+        device.displayMessage(SO_CRANK);
+    }
+
+    //Refill
+    private void refillWhenSoldOut() {
+        soldOut = false;
+        device.displayMessage(NQ_START);
     }
 }
