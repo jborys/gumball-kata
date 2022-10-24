@@ -3,7 +3,11 @@ package edu.designpatterns.state;
 import static edu.designpatterns.state.Messages.*;
 
 public class GumballMachine {
+
     private final GumballHardwareDevice device;
+
+    private GumballMachineState state = new SoldOutState();
+    
     private boolean soldOut;
     private boolean hasQuarter;
 
@@ -15,7 +19,7 @@ public class GumballMachine {
 
     public void quarterInserted() {
         if (soldOut) {
-            quarterInsertedWhenSoldOut();
+            state.quarterInserted(this);
         } else if (hasQuarter) {
             quarterInsertedWhenHasQuarter();
         } else {
@@ -50,6 +54,7 @@ public class GumballMachine {
         }
     }
 
+
     //Insert Quarter
     private void quarterInsertedWhenNoQuarter() {
         device.displayMessage(NQ_QUART);
@@ -75,6 +80,7 @@ public class GumballMachine {
         device.displayMessage(HQ_EJECT);
         device.dispenseQuarter();
         hasQuarter = false;
+
     }
 
     private void ejectQuarterWhenSoldOut() {
@@ -106,4 +112,9 @@ public class GumballMachine {
         soldOut = false;
         device.displayMessage(NQ_START);
     }
+
+    public GumballHardwareDevice getDevice() {
+        return device;
+    }
+
 }
