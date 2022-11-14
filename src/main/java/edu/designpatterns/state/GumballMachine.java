@@ -4,9 +4,10 @@ import static edu.designpatterns.state.Messages.*;
 
 public class GumballMachine {
 	private final GumballHardwareDevice device;
-	private boolean soldOut;
-	private boolean hasQuarter;
+	boolean soldOut;
+	boolean hasQuarter;
 
+	GumballMachineState state;
 	public GumballMachine(GumballHardwareDevice device) {
 		this.device = device;
 		device.displayMessage(SO_START);
@@ -15,47 +16,60 @@ public class GumballMachine {
 
 	public void quarterInserted() {
 		if(soldOut) {
-			device.dispenseQuarter();
-			device.displayMessage(SO_QUART);
+			state = new SoldOutState();
 		} else if (hasQuarter) {
-			device.dispenseQuarter();
-			device.displayMessage(HQ_QUART);
+			state = new HasQuarterState();
 		} else {
-			device.displayMessage(NQ_QUART);
-			hasQuarter = true;
+			state = new HasNoQuarterState();
 		}
+		state.quarterInserted(this);
 	}
 
 	public void ejectQuarterRequested() {
 		if (soldOut) {
-			device.displayMessage(SO_EJECT);
+			state = new SoldOutState();
 		} else if (hasQuarter) {
-			device.dispenseQuarter();
-			device.displayMessage(HQ_EJECT);
+			state = new HasQuarterState();
 		} else {
-			device.displayMessage(NQ_EJECT);
+			state = new HasNoQuarterState();
 		}
+		state.ejectQuarterRequested(this);
 	}
 
 	public void crankTurned() {
 		if (soldOut) {
-			device.displayMessage(SO_CRANK);
+			state = new SoldOutState();
 		} else if (hasQuarter) {
-			if (device.dispenseGumball()) {
-				device.displayMessage(NQ_START);
-			} else {
-				soldOut = true;
-				device.displayMessage(SO_START);
-				device.dispenseQuarter();
-			}
-			hasQuarter = false;
+			state = new HasQuarterState();
 		} else {
-			device.displayMessage(NQ_CRANK);
+			state = new HasNoQuarterState();
 		}
+		state.crankTurned(this);
+	}
+
+	public void crankTurnedWhenHasQuarter() {
+		if (device.dispenseGumball()) {
+			device.displayMessage(NQ_START);
+		} else {
+
+			//old code
+			soldOut = true;
+			device.displayMessage(SO_START);
+			device.dispenseQuarter();
+		}
+		hasQuarter = false;
 	}
 
 	public void reset() {
-		device.displayMessage(NQ_START);
-		soldOut = false;
+		state = new SoldOutState();
+		state.reset(this);
+	}
+
+	public void setState(GumballMachineState state) {
+		this.state = state;
+	}
+
+	public GumballHardwareDevice getDevice() {
+		return device;
 	}
 }

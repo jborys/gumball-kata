@@ -71,9 +71,7 @@ public class GumballMachineTest {
     class HasNoQuarter {
         @Test
         public void quarterInsertedShouldDisplayTurnCrankMsg() {
-            gumballMachine.reset();
-            gumballMachine.quarterInserted();
-
+            insertQuarter();
 
             assertThat(device.getDisplayedMessage()).isEqualTo(Messages.NQ_QUART);
         }
@@ -101,16 +99,14 @@ public class GumballMachineTest {
     class HasQuarter {
         @Test
         public void shouldDisplayTurnCrankForAGumballMsg() {
-            gumballMachine.reset();
-            gumballMachine.quarterInserted();
+            insertQuarter();
 
             assertThat(device.getDisplayedMessage()).isEqualTo(Messages.HQ_START);
         }
 
         @Test
         public void quarterInsertedShouldDisplayInsertedMsgAndDispenseQuarter() {
-            gumballMachine.reset();
-            gumballMachine.quarterInserted();
+            insertQuarter();
             gumballMachine.quarterInserted();
 
             assertThat(device.getDisplayedMessage()).isEqualTo(Messages.HQ_QUART);
@@ -119,8 +115,7 @@ public class GumballMachineTest {
 
         @Test
         public void quarterEjectedShouldDisplayEjectedQuarterMsg() {
-            gumballMachine.reset();
-            gumballMachine.quarterInserted();
+            insertQuarter();
             gumballMachine.ejectQuarterRequested();
 
             assertThat(device.getDisplayedMessage()).isEqualTo(Messages.HQ_EJECT);
@@ -128,9 +123,7 @@ public class GumballMachineTest {
 
         @Test
         public void crankTurnedShouldDisplayGumballMsgAndDispenseGumball() {
-            gumballMachine.reset();
-            device.addGumballs(5);
-            gumballMachine.quarterInserted();
+            insertQuarter();
             gumballMachine.crankTurned();
 
             assertThat(device.getDisplayedMessage()).isEqualTo(Messages.HQ_CRANK);
@@ -139,13 +132,24 @@ public class GumballMachineTest {
 
         @Test
         public void crankTurnedNoGumballsLeftShouldDispenseQuarterAndDisplaySoldOutMsg() {
-            gumballMachine.reset();
-            gumballMachine.quarterInserted();
+            insertQuarter();
+            sellOutGumballs();
             gumballMachine.crankTurned();
-
 
             assertThat(device.getDisplayedMessage()).isEqualTo(Messages.SO_START);
             assertThat(device.dispenseGumball()).isFalse();
         }
+    }
+
+    private void sellOutGumballs() {
+        while (device.dispenseGumball())    {
+            device.dispenseGumball(); System.out.println("Gumball Count: "+device.getCount());
+        }
+    }
+
+    private void insertQuarter() {
+        gumballMachine.reset();
+        device.addGumballs(5);
+        gumballMachine.quarterInserted();
     }
 }
