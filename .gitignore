@@ -21,3 +21,4 @@
 *.iml
 *.ipr
 /out/
+/gradlew.bat
